@@ -1,6 +1,5 @@
 # myssh
 
-## Overview
 sshの接続先の登録，削除と接続ができる．  
 設定ファイルは ``~/.myssh_conf``  
 
