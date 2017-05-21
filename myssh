@@ -1,0 +1,119 @@
+#!/bin/sh
+
+readonly CONFFILE=~/.myssh_conf
+i=1
+
+add(){
+    echo "ユーザ名を入力してください．"
+    read USERNAME
+    echo "ホスト名を入力してください．"
+    read HOSTNAME
+    echo "説明文を入力してください．"
+    read DISCRIPTION
+
+    echo "${USERNAME},${HOSTNAME},${DISCRIPTION}" >> ${CONFFILE}
+
+    return 0
+}
+
+remove(){
+    echo "Number  UserName  HostName  Discription"
+    for line in `cat ${CONFFILE}`
+    do
+        USERNAME=`echo ${line} | cut -d , -f 1`
+        HOSTNAME=`echo ${line} | cut -d , -f 2`
+        DISCRIPTION=`echo ${line} | cut -d , -f 3`
+
+        echo "  $i     ${USERNAME}    ${HOSTNAME}  ${DISCRIPTION}"
+        i=$((++i))
+    done
+
+    i=$((i-1))
+
+    echo "削除したい宛先の番号を入力してください．"
+    read LINE_NUM
+
+    if [ ${LINE_NUM} -gt $i -o ${LINE_NUM} -eq 0 ]; then
+        echo "入力された数値が正しくないためプログラムを終了します．"
+        exit
+    else
+        cat ${CONFFILE} | sed -e "${LINE_NUM}d" > ${CONFFILE}.tmp
+        cat ${CONFFILE}.tmp > ${CONFFILE}
+        rm ${CONFFILE}.tmp
+    fi
+
+    return 0
+}
+
+list(){
+    echo "Number  UserName  HostName  Discription"
+    for line in `cat ${CONFFILE}`
+    do
+        USERNAME=`echo ${line} | cut -d , -f 1`
+        HOSTNAME=`echo ${line} | cut -d , -f 2`
+        DISCRIPTION=`echo ${line} | cut -d , -f 3`
+
+        echo "  $i     ${USERNAME}    ${HOSTNAME}  ${DISCRIPTION}"
+        i=$((++i))
+    done
+
+    return 0
+}
+
+myhelp(){
+    echo "Usage: myssh [option]"
+    echo
+    echo "オプション:"
+    echo "  -h help"
+    echo "  -a add new host"
+    echo "  -l host list"
+    echo "  -r remove host"
+    echo
+    exit
+
+    return 0
+}
+
+mssh(){
+    echo "Number  USERNAME  HostName  Discription"
+    for line in `cat ${CONFFILE}`
+    do
+      USERNAME=`echo ${line} | cut -d , -f 1`
+      HOSTNAME=`echo ${line} | cut -d , -f 2`
+      DISCRIPTION=`echo ${line} | cut -d , -f 3`
+
+      echo "  $i     ${USERNAME}    ${HOSTNAME}  ${DISCRIPTION}"
+      i=$((++i))
+    done
+
+    i=$((i-1))
+
+    echo "接続したい宛先の数字を入力してください．"
+    read LINE_NUM
+
+    if [ ${LINE_NUM} -gt $i -o ${LINE_NUM} -eq 0 ]; then
+        echo "入力された数値が正しくないためプログラムを終了します．"
+        exit
+    else
+        USERNAME=`cat ${CONFFILE} | head -${LINE_NUM} | tail -n 1 | cut -d, -f 1`
+        HOSTNAME=`cat ${CONFFILE} | head -${LINE_NUM} | tail -n 1 | cut -d, -f 2`
+
+        ssh ${USERNAME}@${HOSTNAME}
+    fi
+
+    return 0
+}
+
+getopts "ahlr" opts
+
+if [ $opts = "a" ]; then
+    add
+elif [ $opts = "l" ]; then
+    list
+elif [ $opts = "r" ]; then
+    remove
+elif [ $opts = "h" ]; then
+    myhelp
+else
+    mssh
+fi
