@@ -25,14 +25,14 @@ test
 ### 登録ホストの一覧
 ```
 $myssh -l
-Number  UserName  HostName  Discription
+Number  UserName  HostName  Description
   1     test    127.0.0.1  test
 ```
 
 ### ssh接続
 ```
 $myssh
-Number  USERNAME  HostName  Discription
+Number  USERNAME  HostName  Description
   1     test    127.0.0.1  test
 接続したい宛先の数字を入力してください．
 1
@@ -41,7 +41,7 @@ Number  USERNAME  HostName  Discription
 ### ホストの削除
 ```
 $myssh -r
-Number  USERNAME  HostName  Discription
+Number  USERNAME  HostName  Description
   1     test    127.0.0.1  test
 削除したい宛先の番号を入力してください．
 1

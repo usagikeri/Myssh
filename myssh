@@ -9,22 +9,22 @@ add(){
     echo "ホスト名を入力してください．"
     read HOSTNAME
     echo "説明文を入力してください．"
-    read DISCRIPTION
+    read DESCRIPTION
 
-    echo "${USERNAME},${HOSTNAME},${DISCRIPTION}" >> ${CONFFILE}
+    echo "${USERNAME},${HOSTNAME},${DESCRIPTION}" >> ${CONFFILE}
 
     return 0
 }
 
 remove(){
-    echo "Number  UserName  HostName  Discription"
+    echo "Number  UserName  HostName  Description"
     for line in `cat ${CONFFILE}`
     do
         USERNAME=`echo ${line} | cut -d , -f 1`
         HOSTNAME=`echo ${line} | cut -d , -f 2`
-        DISCRIPTION=`echo ${line} | cut -d , -f 3`
+        DESCRIPTION=`echo ${line} | cut -d , -f 3`
 
-        echo "  $i     ${USERNAME}    ${HOSTNAME}  ${DISCRIPTION}"
+        echo "  $i     ${USERNAME}    ${HOSTNAME}  ${DESCRIPTION}"
         i=$((++i))
     done
 
@@ -46,14 +46,14 @@ remove(){
 }
 
 list(){
-    echo "Number  UserName  HostName  Discription"
+    echo "Number  UserName  HostName  Description"
     for line in `cat ${CONFFILE}`
     do
         USERNAME=`echo ${line} | cut -d , -f 1`
         HOSTNAME=`echo ${line} | cut -d , -f 2`
-        DISCRIPTION=`echo ${line} | cut -d , -f 3`
+        DESCRIPTION=`echo ${line} | cut -d , -f 3`
 
-        echo "  $i     ${USERNAME}    ${HOSTNAME}  ${DISCRIPTION}"
+        echo "  $i     ${USERNAME}    ${HOSTNAME}  ${DESCRIPTION}"
         i=$((++i))
     done
 
@@ -75,14 +75,14 @@ myhelp(){
 }
 
 mssh(){
-    echo "Number  USERNAME  HostName  Discription"
+    echo "Number  USERNAME  HostName  Description"
     for line in `cat ${CONFFILE}`
     do
       USERNAME=`echo ${line} | cut -d , -f 1`
       HOSTNAME=`echo ${line} | cut -d , -f 2`
-      DISCRIPTION=`echo ${line} | cut -d , -f 3`
+      DESCRIPTION=`echo ${line} | cut -d , -f 3`
 
-      echo "  $i     ${USERNAME}    ${HOSTNAME}  ${DISCRIPTION}"
+      echo "  $i     ${USERNAME}    ${HOSTNAME}  ${DESCRIPTION}"
       i=$((++i))
     done
 
