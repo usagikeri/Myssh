@@ -75,7 +75,7 @@ myhelp(){
 }
 
 mssh(){
-    echo "Number  USERNAME  HostName  Description"
+    echo "Number  UserName  HostName  Description"
     for line in `cat ${CONFFILE}`
     do
       USERNAME=`echo ${line} | cut -d , -f 1`
