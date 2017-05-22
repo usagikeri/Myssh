@@ -33,7 +33,7 @@ Number  UserName  HostName  Description
 $myssh
 Number  USERNAME  HostName  Description
   1     test    127.0.0.1  test
-接続したい宛先の数字を入力してください．
+接続したいホストの数字を入力してください．
 1
 ```
 
@@ -42,7 +42,7 @@ Number  USERNAME  HostName  Description
 $myssh -r
 Number  USERNAME  HostName  Description
   1     test    127.0.0.1  test
-削除したい宛先の番号を入力してください．
+削除したいホストの番号を入力してください．
 1
 ```
 

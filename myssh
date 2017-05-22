@@ -30,7 +30,7 @@ remove(){
 
     i=$((i-1))
 
-    echo "削除したい宛先の番号を入力してください．"
+    echo "削除したいホストの番号を入力してください．"
     read LINE_NUM
 
     if [ ${LINE_NUM} -gt $i -o ${LINE_NUM} -eq 0 ]; then
@@ -88,7 +88,7 @@ mssh(){
 
     i=$((i-1))
 
-    echo "接続したい宛先の数字を入力してください．"
+    echo "接続したいホストの数字を入力してください．"
     read LINE_NUM
 
     if [ ${LINE_NUM} -gt $i -o ${LINE_NUM} -eq 0 ]; then
