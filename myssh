@@ -1,63 +1,69 @@
-#!/bin/sh
+#/bin/sh
+CONFFILE=~/.myssh_conf
 
-readonly CONFFILE=~/.myssh_conf
-i=1
+function menu {
+    # メニューカーソルの位置
+    choice=0
+    # 列情報
+    RAW=""
+    # メニューを配列でずらっと
+    menu=(`cat ~/.myssh_conf`)
+    tail=`expr ${#menu[@]} - 1` # メニューの末尾番号
+    printf "\e[32mChoose one\e[m\n"  >&2 # 緑色で "choose one"
+    # 下のループの先頭でメニューの数だけ上ってくるので、
+    # メニューの数だけ下改行しておく
+    for _ in $(seq 0 $tail);do echo "";done
 
-add(){
-    echo "ユーザ名を入力してください．"
-    read USERNAME
-    echo "ホスト名を入力してください．"
-    read HOSTNAME
-    echo "説明文を入力してください．"
-    read DESCRIPTION
-
-    echo "${USERNAME},${HOSTNAME},${DESCRIPTION}" >> ${CONFFILE}
-
-    return 0
-}
-
-remove(){
-    echo "Number  UserName  HostName  Description"
-    for line in `cat ${CONFFILE}`
+    # 無限ループ
+    while true
     do
-        USERNAME=`echo ${line} | cut -d , -f 1`
-        HOSTNAME=`echo ${line} | cut -d , -f 2`
-        DESCRIPTION=`echo ${line} | cut -d , -f 3`
+        # \e[<配列の長さ>A でメニューの数だけ上に移動
+        printf "\e[${#menu[@]}A\e[m" >&2
 
-        echo "  $i     ${USERNAME}    ${HOSTNAME}  ${DESCRIPTION}"
-        i=$((++i))
+        # メニューをそれぞれ出力する
+        for i in $(seq 0 $tail);do
+            if [ $choice = $i ]
+            then # メニューが選択中なら
+                # \e[1;31 (bold);(red)で
+                # '> '
+                # をprint
+                # 続く文字列を \e[1;4 (bold);(underlined)にする
+                printf "\e[1;31m>\e[m \e[1;4m" >&2
+            else # メニューが選択中でなければ
+                # 空白をprint
+                printf "  " >&2
+            fi
+            # メニューをprintし、graphic modeを閉じる
+            printf "${menu[$i]}\e[m\n" >&2
+        done
+
+        # 一文字入力を読む
+        read -sn1 answer
+        # エスケープコードが打たれたら
+        if [ "$answer" = "^[" ]; then # (^[はctrl+V ctrl+[とかで入力してね)
+            # 残りのエスケープコードを読む
+            read -sn2 answer
+            # アローキーなら^[[A, B, C, Dってなるよ
+        fi
+        case $answer in
+            "j"|"[B")
+                # j, 下アローキーで下に移動（choice+1）
+                # choiceの最大値はメニュー配列の末尾番号なので超えないように
+                if [ $choice -lt $tail ]; then choice=`expr $choice + 1`; fi
+                ;;
+            "k"|"[A")
+                # k, 上アローキーで上に移動（choice-1）
+                # choiceの最小値は0なので超えないように
+                if [ $choice -gt 0 ]; then choice=`expr $choice - 1`; fi
+                ;;
+            "")
+                # 改行で決定
+                RAW=${menu[$choice]}
+                echo $raw
+                return 0
+                ;;
+        esac
     done
-
-    i=$((i-1))
-
-    echo "削除したいホストの番号を入力してください．"
-    read LINE_NUM
-
-    if [ ${LINE_NUM} -gt $i -o ${LINE_NUM} -eq 0 ]; then
-        echo "入力された数値が正しくないためプログラムを終了します．"
-        exit
-    else
-        cat ${CONFFILE} | sed -e "${LINE_NUM}d" > ${CONFFILE}.tmp
-        cat ${CONFFILE}.tmp > ${CONFFILE}
-        rm ${CONFFILE}.tmp
-    fi
-
-    return 0
-}
-
-list(){
-    echo "Number  UserName  HostName  Description"
-    for line in `cat ${CONFFILE}`
-    do
-        USERNAME=`echo ${line} | cut -d , -f 1`
-        HOSTNAME=`echo ${line} | cut -d , -f 2`
-        DESCRIPTION=`echo ${line} | cut -d , -f 3`
-
-        echo "  $i     ${USERNAME}    ${HOSTNAME}  ${DESCRIPTION}"
-        i=$((++i))
-    done
-
-    return 0
 }
 
 myhelp(){
@@ -74,35 +80,55 @@ myhelp(){
     return 0
 }
 
-mssh(){
-    echo "Number  UserName  HostName  Description"
-    for line in `cat ${CONFFILE}`
-    do
-      USERNAME=`echo ${line} | cut -d , -f 1`
-      HOSTNAME=`echo ${line} | cut -d , -f 2`
-      DESCRIPTION=`echo ${line} | cut -d , -f 3`
 
-      echo "  $i     ${USERNAME}    ${HOSTNAME}  ${DESCRIPTION}"
-      i=$((++i))
-    done
+list( ){
+    # メニューを配列でずらっと
+    menu=(`cat ~/.myssh_conf`)
+    tail=`expr ${#menu[@]} - 1` # メニューの末尾番号
+    # 下のループの先頭でメニューの数だけ上ってくるので、
+    # メニューの数だけ下改行しておく
+    for _ in $(seq 0 $tail);do echo "";done
 
-    i=$((i-1))
+   # \e[<配列の長さ>A でメニューの数だけ上に移動
+   printf "\e[${#menu[@]}A\e[m" >&2
 
-    echo "接続したいホストの数字を入力してください．"
-    read LINE_NUM
+   # メニューをそれぞれ出力する
+   for i in $(seq 0 $tail);do
+       printf "${menu[$i]}\e[m\n" >&2
+   done
+}
 
-    if [ ${LINE_NUM} -gt $i -o ${LINE_NUM} -eq 0 ]; then
-        echo "入力された数値が正しくないためプログラムを終了します．"
-        exit
-    else
-        USERNAME=`cat ${CONFFILE} | head -${LINE_NUM} | tail -n 1 | cut -d, -f 1`
-        HOSTNAME=`cat ${CONFFILE} | head -${LINE_NUM} | tail -n 1 | cut -d, -f 2`
 
-        ssh ${USERNAME}@${HOSTNAME}
-    fi
-
+remove(){
+    sed -i -e "/${RAW}/d" ${CONFFILE}
     return 0
 }
+
+
+add(){
+    echo "Please Input UserName."
+    read USERNAME
+    echo "Please input HostName"
+    read HOSTNAME
+    echo "Please input Description."
+    read DESCRIPTION
+
+    echo "${USERNAME},${HOSTNAME},${DESCRIPTION}" >> ${CONFFILE}
+    echo "Register in ${CONFFILE}"
+    return 0
+}
+
+
+mssh(){
+     USERNAME=`echo $RAW | cut -d, -f 1`
+     HOSTNAME=`echo $RAW | cut -d, -f 2`
+
+     echo ${USERNAME}@${HOSTNAME}
+     ssh ${USERNAME}@${HOSTNAME}
+
+     return 0
+}
+
 
 getopts "ahlr" opts
 
@@ -111,9 +137,11 @@ if [ $opts = "a" ]; then
 elif [ $opts = "l" ]; then
     list
 elif [ $opts = "r" ]; then
+    menu
     remove
 elif [ $opts = "h" ]; then
     myhelp
 else
+    menu
     mssh
 fi
