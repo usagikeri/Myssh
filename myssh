@@ -1,6 +1,5 @@
 #/bin/sh
-CONFFILE=~/.myssh_conf
-
+CONFFILE=~/.myssh_conf 
 function menu {
     choice=0
     RAW=""
@@ -58,7 +57,7 @@ myhelp(){
 }
 
 
-list( ){
+list(){
     menu=(`cat ~/.myssh_conf`)
     tail=`expr ${#menu[@]} - 1` 
     for _ in $(seq 0 $tail);do echo "";done
@@ -78,13 +77,18 @@ remove(){
 add(){
     echo "Please Input UserName."
     read USERNAME
+    USERNAME=`echo $USERNAME | sed "s/ /_/g"`
     echo "Please input HostName"
     read HOSTNAME
+    HOSTNAME=`echo $HOSTNAME | sed "s/ /_/g"`
     echo "Please input Description."
     read DESCRIPTION
+    DESCRIPTION=`echo $DESCRIPTION | sed "s/ /_/g"`
 
     echo "${USERNAME},${HOSTNAME},${DESCRIPTION}" >> ${CONFFILE}
     echo "Register in ${CONFFILE}"
+    echo ""
+    list
     return 0
 }
 
